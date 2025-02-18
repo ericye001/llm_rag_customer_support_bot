@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Chatbot</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            white-space: pre-wrap; /* or pre-line */
+        }
+        
+        .message {
+            padding: 10px 16px;
+            border-radius: 20px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background: #e3f2fd;
+            color: #1976d2;
+            align-self: flex-end;
+        }
+        
+        .bot-message {
+            background: #f5f5f5;
+            color: #333;
+            align-self: flex-start;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button.outline {
+            background: transparent;
+            border: 1px solid #1976d2;
+            color: #1976d2;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">SIIG Customer Service Chatbot Beta</h2>
+        </div>
+        <div class="card-content">
+            <div class="message-container" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Type your message...">
+                <button onclick="handleSend()">Send</button>
+            </div>
+            <div class="options-grid" id="optionsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const predefinedResponses = {
+            "how do i return a product": "To return a product, please visit our Returns page for instructions.",
+            "what are your business hours": "Our business hours are Monday to Friday, 9 AM to 5 PM.",
+            "check order status": "You can check your order status by login to siig.com, visiting the Order Status page with your order number.",
+            "contact support": "You can contact support via email at support@siig.com or call us at 123-456-7890.",
+            "default": "I'm sorry, I didn't understand your question. Please try again or select an option below."
+        };
+
+        const predefinedOptions = [
+            "How do I return a product?",
+            "What are your business hours?",
+            "Check order status",
+            "Contact support"
+        ];
+
+        let messages = [];
+        const messagesContainer = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const optionsContainer = document.getElementById('optionsContainer');
+
+        // Initialize options buttons
+        predefinedOptions.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'outline';
+            button.textContent = option;
+            button.onclick = () => handleOptionClick(option);
+            optionsContainer.appendChild(button);
+        });
+
+        function renderMessages() {
+            messagesContainer.innerHTML = '';
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.sender}-message`;
+                messageDiv.textContent = message.text;
+                messagesContainer.appendChild(messageDiv);
+            });
+        }
+
+        function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Add user message
+            messages.push({ sender: 'user', text });
+            renderMessages();
+
+            // Get bot response
+            const lowerCaseText = text.toLowerCase();
+            aresponse = predefinedResponses[lowerCaseText] || predefinedResponses.default;
+
+            const adata = {
+                message: text,
+              };
+              fetch('https://support-ai-chatbot-294299792330.us-central1.run.app/chat', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(adata)
+              })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok ' + response.statusText);
+                }
+                console.log('Success:', response);
+                return response.json(); // Parse the JSON from the response
+            })
+              .then(data => {
+                // Append chatbot reply to the chat widget
+                //console.log('Success:', data);
+                aresponse = data.response;
+                console.log('Success 222:', aresponse);
+                //re = /\n/g;
+                //aresponse = aresponse.replace(re, ' <br /> ');
+                // Add bot response after short delay = 200ms
+                setTimeout(() => {
+                    messages.push({ sender: 'bot', text: aresponse });
+                    renderMessages();
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 200);
+              })
+              .catch(error => console.error('Error:', error));
+            
+            //console.log('Success 3:', aresponse);
+            
+            
+
+
+            userInput.value = '';
+        }
+
+        function handleOptionClick(option) {
+            userInput.value = option;
+            handleSend();
+        }
+
+        // Handle Enter key
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    </script>
+</body>
+</html>
+

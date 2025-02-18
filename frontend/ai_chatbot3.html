@@ -103,7 +103,9 @@
             <h2 class="card-title">SIIG Customer Service Chatbot Beta</h2>
         </div>
         <div class="card-content">
-            <div class="message-container" id="messages"></div>
+            <div class="message-container" id="messages">
+                <div class="message bot-message">SIIG AI Agent : Hi there! I am the SIIG AI Agent, How can I help you today?</div>
+            </div>
             <div class="input-container">
                 <input type="text" id="userInput" placeholder="Type your message...">
                 <button onclick="handleSend()">Send</button>
@@ -129,6 +131,7 @@
         ];
 
         let messages = [];
+        messages.push({ sender: 'bot', text: 'Hi there! I am the SIIG AI Agent, How can I help you today?' });
         const messagesContainer = document.getElementById('messages');
         const userInput = document.getElementById('userInput');
         const optionsContainer = document.getElementById('optionsContainer');
@@ -145,9 +148,15 @@
         function renderMessages() {
             messagesContainer.innerHTML = '';
             messages.forEach(message => {
-                const messageDiv = document.createElement('div');
+                messageDiv = document.createElement('div');
                 messageDiv.className = `message ${message.sender}-message`;
-                messageDiv.textContent = message.text;
+                //<strong>{msg.sender === 'bot' ? 'Bot' : 'You'}:</strong>
+                //strongElement = document.createElement('strong');
+                whoisspeaking = message.sender === 'bot' ? 'SIIG AI Agent : ' : 'You : ';
+                //messageDiv.appendChild(strongElement);
+                //console.log('strongElement:', strongElement);
+                //console.log('messageDiv:', messageDiv);
+                messageDiv.textContent = whoisspeaking + message.text;
                 messagesContainer.appendChild(messageDiv);
             });
         }

@@ -97,7 +97,7 @@
         }
     </style>
 </head>
-<body>
+<body  onload="generateSession()">
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">SIIG Customer Service Chatbot Beta</h2>
@@ -135,6 +135,19 @@
         const messagesContainer = document.getElementById('messages');
         const userInput = document.getElementById('userInput');
         const optionsContainer = document.getElementById('optionsContainer');
+
+        //messagesContainer.onload = function() {generateSession()};
+
+        function generateGuid() {
+            return Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15);    
+        }
+        
+        var my_session = '1234567890';
+        function generateSession() {
+            my_session = generateGuid();
+            console.log('my_session:', my_session);
+        }
 
         // Initialize options buttons
         predefinedOptions.forEach(option => {
@@ -175,6 +188,7 @@
 
             const adata = {
                 message: text,
+                session: my_session
               };
               fetch('https://support-ai-chatbot-294299792330.us-central1.run.app/chat', {
                 method: 'POST',

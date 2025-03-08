@@ -25,8 +25,8 @@
         }
         
         .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.35rem;
+            font-weight: 500;
             margin: 0;
         }
         
@@ -53,11 +53,24 @@
             color: #1976d2;
             align-self: flex-end;
         }
-        
+
+        .user-avatar {
+            background: #e3f2fd;
+            color: #199612;
+            align-self: flex-end;
+            font-weight: 500;
+        }
+
         .bot-message {
             background: #f5f5f5;
             color: #333;
             align-self: flex-start;
+        }
+        .bot-avatar {
+            background: #f5f5f5;
+            color: #aa5555;
+            align-self: flex-start;
+            font-weight: 500;
         }
         
         .input-container {
@@ -74,8 +87,16 @@
             font-size: 16px;
         }
         
-        button {
-            padding: 10px 20px;
+
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .options-grid button {
+            padding: 5px 15px;
             background: #1976d2;
             color: white;
             border: none;
@@ -84,31 +105,98 @@
             font-size: 14px;
         }
         
-        button.outline {
+        .options-grid button.outline {
             background: transparent;
-            border: 1px solid #1976d2;
-            color: #1976d2;
+            border-radius: 15px;
+            border: 1px solid #9cb2c6;
+            color: #385673;
         }
-        
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+
+            /* Bot thinking indicator styling */
+        .bot-thinking {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        color: #888;
         }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chatbox {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 25px;
+            padding: 10px 15px;
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            border: 1px solid #9cb2c6;
+            background-color: #fff;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .chatbox input[type="text"] {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .chatbox button {
+            border: none;
+            background-color: #e6edf5;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .chatbox button:hover {
+            background-color: #c2d4ea;
+        }
+
+        .chatbox button svg {
+            fill: #5b7c99;
+            width: 20px;
+            height: 20px;
+        }
+
     </style>
 </head>
 <body  onload="generateSession()">
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">SIIG Customer Service Chatbot Beta</h2>
+            <img src="./siiglogo_full.png" alt="SIIG Logo" style="height: 45px; margin-right: 10px;">
+            <h2 class="card-title">SIIG AI Customer Service Agent beta 0.2 </h2>
         </div>
         <div class="card-content">
             <div class="message-container" id="messages">
-                <div class="message bot-message">SIIG AI Agent : Hi there! I am the SIIG AI Agent, How can I help you today?</div>
+                <div class="message bot-message"> Hi there! I am the SIIG AI Agent, How can I help you today? by the way, you can say anything in natural language</div>
             </div>
-            <div class="input-container">
+            <div class="chatbox">
                 <input type="text" id="userInput" placeholder="Type your message...">
-                <button onclick="handleSend()">Send</button>
+                <button onclick="handleSend()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"></path>
+                    </svg>
+                </button>
             </div>
             <div class="options-grid" id="optionsContainer"></div>
         </div>
@@ -158,18 +246,30 @@
             optionsContainer.appendChild(button);
         });
 
+        // Helper function to detect URLs and create <a> tags (using a simple regex)
+        function linkify(inputText) {
+            const urlRegex = /(https?:\/\/[^\s]+?)(?=[.,;!?]?(\s|$))/g; // Basic URL regex, exclude the trailing punctuation
+            return inputText.replace(urlRegex, function(url) {
+                return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+            });
+        }
+
         function renderMessages() {
             messagesContainer.innerHTML = '';
             messages.forEach(message => {
                 messageDiv = document.createElement('div');
+                avatarDiv = document.createElement('div');
                 messageDiv.className = `message ${message.sender}-message`;
+                avatarDiv.className = `message ${message.sender}-avatar`;
                 //<strong>{msg.sender === 'bot' ? 'Bot' : 'You'}:</strong>
                 //strongElement = document.createElement('strong');
                 whoisspeaking = message.sender === 'bot' ? 'SIIG AI Agent : ' : 'You : ';
                 //messageDiv.appendChild(strongElement);
                 //console.log('strongElement:', strongElement);
                 //console.log('messageDiv:', messageDiv);
-                messageDiv.textContent = whoisspeaking + message.text;
+                avatarDiv.textContent = whoisspeaking;
+                messageDiv.innerHTML = linkify(message.text);
+                if (message.sender === 'bot') messagesContainer.appendChild(avatarDiv);
                 messagesContainer.appendChild(messageDiv);
             });
         }
@@ -221,8 +321,16 @@
               .catch(error => console.error('Error:', error));
             
             //console.log('Success 3:', aresponse);
-            
-            
+
+                  // Create the bot thinking container
+            const thinkingDiv = document.createElement("div");
+            thinkingDiv.classList.add("message", "bot-thinking");
+                  // Create the spinner element
+            const spinner = document.createElement("div");
+            spinner.classList.add("spinner");
+            thinkingDiv.appendChild(spinner);
+            messagesContainer.appendChild(thinkingDiv);
+
 
 
             userInput.value = '';

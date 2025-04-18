@@ -261,12 +261,9 @@
                 avatarDiv = document.createElement('div');
                 messageDiv.className = `message ${message.sender}-message`;
                 avatarDiv.className = `message ${message.sender}-avatar`;
-                //<strong>{msg.sender === 'bot' ? 'Bot' : 'You'}:</strong>
-                //strongElement = document.createElement('strong');
+
                 whoisspeaking = message.sender === 'bot' ? 'SIIG AI Agent : ' : 'You : ';
-                //messageDiv.appendChild(strongElement);
-                //console.log('strongElement:', strongElement);
-                //console.log('messageDiv:', messageDiv);
+
                 avatarDiv.textContent = whoisspeaking;
                 messageDiv.innerHTML = linkify(message.text);
                 if (message.sender === 'bot') messagesContainer.appendChild(avatarDiv);
@@ -306,11 +303,10 @@
             })
               .then(data => {
                 // Append chatbot reply to the chat widget
-                //console.log('Success:', data);
+
                 aresponse = data.response;
                 console.log('Success 222:', aresponse);
-                //re = /\n/g;
-                //aresponse = aresponse.replace(re, ' <br /> ');
+
                 // Add bot response after short delay = 200ms
                 setTimeout(() => {
                     messages.push({ sender: 'bot', text: aresponse });
@@ -320,12 +316,12 @@
               })
               .catch(error => console.error('Error:', error));
             
-            //console.log('Success 3:', aresponse);
 
-                  // Create the bot thinking container
+            // Create the bot thinking container
             const thinkingDiv = document.createElement("div");
             thinkingDiv.classList.add("message", "bot-thinking");
-                  // Create the spinner element
+            
+            // Create the spinner element
             const spinner = document.createElement("div");
             spinner.classList.add("spinner");
             thinkingDiv.appendChild(spinner);

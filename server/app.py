@@ -174,7 +174,6 @@ def get_additional_context(qqq: str):
         more_contexts = f"SKU or part number : {part_num} , " + page
     return more_contexts
 
-# Example chatbot function (replace with your actual LLM integration)
 def generate_response(user_input, sessionid):
     global qa_chain
     #global chat_history
@@ -186,19 +185,19 @@ def generate_response(user_input, sessionid):
     if query.lower() in ["exit", "quit"]:
         return "Goodbye!"
     try:
-        print(qa_chain)
         print(query)
-        #answer = qa_chain.run(query)
+
         chat_history = get_session_history(sessionid)
         chat_history_string = " ".join([f"{msg}" for msg in chat_history])
-        #print(chat_history_string)
+
         additional = get_additional_context(query+chat_history_string)
-        #print(additional)
+
         ai_msg_1 =qa_chain.invoke({"input": query, "chat_history": chat_history,"additional_context":[SystemMessage(additional)]})
+        
         chat_history.extend([HumanMessage(content=query), ai_msg_1["answer"]])
         update_session(sessionid,chat_history)
+        
         answer = ai_msg_1["answer"]
-        #print("\nchat history:",  chat_history)
         print("\ngenerate_response Answer:", answer)
     except Exception as e:
         answer = "Sorry, an error occurred:"+str(e)
